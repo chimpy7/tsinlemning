@@ -1,0 +1,20 @@
+For setup in ts 
+1 add env file for ur link  and also for port so it know where it connects 
+these are ignored by me so add them yourself or intiliaze them 
+node_modules
+.env
+dist
+
+Database choice : My choice in db was a nosql mongoose aplication beacuse ease of use connection and structure of nosql ever since the introduction of nosql has it become my choice as default so thats the reason  i choose it . 
+
+im not using any special packages over what was required express node and typescript i use thunderclient as my choice of testing api i used postman but ease of acess lead me too keep using thunderclient. 
+
+
+
+
+while updating a user  here is exampel code on a patch request : {
+"id":"ewqqwewqeqweq21313132",
+"update":{"name":"BestestFlanders"}
+
+  
+}
