@@ -12,6 +12,11 @@ export async function getUsers(req:Request,res:Response) {
 export async function createUser(req:Request,res:Response) {
   try {
     const { name, email, password } = req.body;
+if(password.length < 8){
+  return res.status(400).json({message:"Password must be at least 8 characters long"});
+}
+
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new users({ name, email, password: hashedPassword });
     await user.save();
