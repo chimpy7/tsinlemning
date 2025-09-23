@@ -20,11 +20,11 @@ export interface ITask extends Document {
 const Mytaskschema = new Schema<ITask>(
   {
     title: { type: String, required: true ,unique:true},
-    description: { type: String },
+    description: { type: String, },
     status: {
       type: String,
       enum: Object.values(taskstatuses),
-      default: taskstatuses.starting,
+      required:true,
     },
     asignedtoo: { type: Schema.Types.ObjectId, ref: "User", default: null },
     finishedat: { type: Date, default: null },
@@ -33,33 +33,5 @@ const Mytaskschema = new Schema<ITask>(
 );
 
 
-//middleware 
-
-Mytaskschema.pre("save", function (next) {
-  if (this.isModified('status')) {
-    if (this.status === 'done' && this.finishedat === null) {
-      this.finishedat = new Date();
-    } else if (this.status !== 'done') {
-      this.finishedat = null;
-    }
-  }
-  next();
-});
-
-Mytaskschema.pre(["findOneAndUpdate", "updateOne"], function (next) {
-  const update: any = this.getUpdate();
-  if (update?.status) {
-    if (!Object.values(taskstatuses).includes(update.status)) {
-      return next(new Error(`Invalid task status: ${update.status}`));
-    }
-   
-    if (update.status === 'done') {
-      update.finishedat = new Date();
-    } else if (update.status !== 'done') {
-      update.finishedat = null;
-    }
-  }
-  next();
-});
 
 export const Tasks = mongoose.model<ITask>("Tasks", Mytaskschema);

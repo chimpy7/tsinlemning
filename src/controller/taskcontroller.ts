@@ -1,6 +1,8 @@
 
 import type { Request, Response } from "express";
 import  {Tasks, taskstatuses } from "../models/TaskSchema.js";
+import {users} from "../models/userSchema.js";
+import mongoose from "mongoose";
 interface tasks {
   title: string;
   description: string;
@@ -10,15 +12,37 @@ interface tasks {
 }
 
  export async function createTask(req:Request,res:Response) {
-    const  { title, description, status, asignedtoo, finishedat } = req.body;
+    const { title, description, status, asignedtoo, finishedat } = req.body;
+
     try {
-        await Tasks.create<tasks>({ title, description, status, asignedtoo, finishedat });
+        if (!title || !description || !status) {
+            return res.status(400).json({ message: "Title, description, and status are required" });
+        }
+
+        if (asignedtoo !== undefined && asignedtoo !== null) {
+           
+            const userExists = await users.findById(asignedtoo);
+            if (!userExists) {
+                return res.status(400).json({ message: "Assigned user does not exist" });
+            }
+        }
+
+       
+        const taskData: any = { title, description, status, asignedtoo };
+
+      
+        if (status === "done" || status === taskstatuses.Done) {
+            taskData.finishedat = new Date();
+        } else {
+            taskData.finishedat = null;
+        }
+
+        await Tasks.create(taskData);
         res.status(201).json({ message: "Task created successfully" });
-        
+
     } catch (error) {
         res.status(500).json({ message: "Error creating task", error });
     }
-
 
 
     
@@ -26,6 +50,8 @@ interface tasks {
 
 
  export async function getTasks(req:Request,res:Response) {
+
+   
 
     try {
        const foundusersdata= await Tasks.find().populate("assignedTo")
@@ -56,22 +82,69 @@ interface tasks {
  }
 
  export async function updateTasks(req:Request,res:Response){
-  const {id,update} = req.body
-
-  if(!update){
- res.status(404).json({ message: "Error updating tasks add update tag",  });
-
-
-  }
-  
-   try {
-
-    const updatetasks = await Tasks.findByIdAndUpdate(id,{$set: update},{new:true})
-
-        res.status(200).json({message:"Task has been sucessuflly Updated the task"})
+   const { id } = req.params;
+    const update = req.body;
     
-   } catch (error) {
-      res.status(500).json({ message: "Error Deleting tasks", error });
-    
-   }
+    if (!update || Object.keys(update).length === 0) {
+        return res.status(400).json({ message: "Error updating tasks: no update data provided" });
+    }
+
+    try {
+     
+        if (update.asignedtoo !== undefined && update.asignedtoo !== null) {
+            const userExists = await users.findById(update.asignedtoo);
+            if (!userExists) {
+                return res.status(400).json({ message: "Assigned user does not exist" });
+            }
+        }
+
+   
+        if (update.status) {
+            if (update.status === "done" || update.status === taskstatuses.Done) {
+                update.finishedat = new Date();
+            } else {
+                update.finishedat = null;
+            }
+        }
+
+        const updatedTask = await Tasks.findByIdAndUpdate(
+            id, 
+            { $set: update }, 
+            { new: true, runValidators: true }
+        );
+        
+        if (!updatedTask) {
+            return res.status(404).json({ message: "Task not found" });
+        }
+
+        res.status(200).json({ 
+            message: "Task has been successfully updated", 
+            task: updatedTask 
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: "Error updating task", error });
+    }
 }
+
+
+export async function assignTaskToUser(req:Request,res:Response){
+
+try {  const {taskid} = req.params  // det förvinarrade me som fan så här  det här PRODUKT  id DVS FRÅN KLUSTER PRODUKT
+   const {asignedtoo} = req.body  // DET HÄR USER ID 
+   const finduser = await Tasks.findByIdAndUpdate(taskid,{$set:{asignedtoo:asignedtoo}},{new:true})
+   res.status(200).json({message:"Task has been assigned to user"})  
+} catch (error) {
+   
+   res.status(500).json({message:"error accoured while trying to assign task to user",error})
+}
+
+//   exempel  http://localhost:5000/task/68c57b3ffceqwwewqeqwqa1564b04eqwedeeqb3re23 <== task id   //  {"asignedtoo":"68c57aa835bbebceqeqeewq56fbcbqxebdqad1d"}
+
+}
+
+
+
+
+
+

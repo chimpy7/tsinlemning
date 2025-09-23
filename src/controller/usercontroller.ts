@@ -46,11 +46,16 @@ export async function RemoveUsers(req:Request,res:Response) {
 
 export async function findandubdate(req:Request,Res:Response) {
 
-  const {id,update} = req.body
+  const update = req.body
+   const {id} = req.params
+  update.password = await bcrypt.hash(update.password,10)
+
+
+ 
 
   try {
 
-    const findandupdate = await users.findByIdAndUpdate(id,update)
+    const findandupdate = await users.findByIdAndUpdate(id,  { $set: update }, { new: true, runValidators: true })
       Res.status(200).json({message:"Succseful update!"});
 
     
@@ -59,3 +64,6 @@ export async function findandubdate(req:Request,Res:Response) {
   }
   
 }
+
+
+
