@@ -1,8 +1,6 @@
 
 import type { Request, Response } from "express";
 import  {Tasks, taskstatuses } from "../models/TaskSchema.js";
-import {users} from "../models/userSchema.js";
-import mongoose from "mongoose";
 interface tasks {
   title: string;
   description: string;
@@ -17,14 +15,6 @@ interface tasks {
     try {
         if (!title || !description || !status) {
             return res.status(400).json({ message: "Title, description, and status are required" });
-        }
-
-        if (asignedtoo !== undefined && asignedtoo !== null) {
-           
-            const userExists = await users.findById(asignedtoo);
-            if (!userExists) {
-                return res.status(400).json({ message: "Assigned user does not exist" });
-            }
         }
 
        
@@ -54,7 +44,7 @@ interface tasks {
    
 
     try {
-       const foundusersdata= await Tasks.find().populate("assignedTo")
+       const foundusersdata= await Tasks.find().populate("asignedtoo")
       res.status(201).json(foundusersdata);
 
         
@@ -91,13 +81,7 @@ interface tasks {
 
     try {
      
-        if (update.asignedtoo !== undefined && update.asignedtoo !== null) {
-            const userExists = await users.findById(update.asignedtoo);
-            if (!userExists) {
-                return res.status(400).json({ message: "Assigned user does not exist" });
-            }
-        }
-
+       
    
         if (update.status) {
             if (update.status === "done" || update.status === taskstatuses.Done) {

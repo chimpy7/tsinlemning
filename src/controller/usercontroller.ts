@@ -19,7 +19,7 @@ if(password.length < 8){
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new users({ name, email, password: hashedPassword });
-    await user.save();
+    await users.create(user);
     res.status(201).json(user);
   } catch (err: any) {
     res.status(400).json({ error: err.message });
