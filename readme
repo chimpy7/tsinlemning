@@ -7,14 +7,17 @@ dist
 
 Database choice : My choice in db was a nosql mongoose aplication beacuse ease of use connection and structure of nosql ever since the introduction of nosql has it become my choice as default so thats the reason  i choose it . 
 
-im not using any special packages over what was required express node and typescript i use thunderclient as my choice of testing api i used postman but ease of acess lead me too keep using thunderclient. 
+im not using any special packages over what was required express node and typescript i use thunderclient as my choice of testing api i used postman but ease of acess lead me too keep using thunderclient.
+
+the way the application works is we have 2 colums tasks and users  we have crude operation so u can create read update delete for both of them and they intereact realtivly well there is some  error handling too make sure not wrong data arrives too the database . 
+
+Please do  NPM i  and npm run build 
+too run seed : 
+ npx tsc
+ then run : 
+node dist/seed/seed.js
 
 
+mvh aleks 
 
 
-while updating a user  here is exampel code on a patch request : {
-"id":"ewqqwewqeqweq21313132",
-"update":{"name":"BestestFlanders"}
-
-  
-}

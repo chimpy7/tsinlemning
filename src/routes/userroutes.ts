@@ -3,9 +3,9 @@ import { getUsers, createUser,RemoveUsers,findandubdate } from "../controller/us
 
 const router = express.Router();
 
-router.get("/", getUsers);
-router.post("/", createUser);
-router.delete("/",RemoveUsers)
-router.patch("/:id",findandubdate)
+router.get("/user", getUsers);
+router.post("/user", createUser);
+router.delete("/user",RemoveUsers)
+router.patch("/user/:id",findandubdate)
 
 export default router;

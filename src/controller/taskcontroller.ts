@@ -74,6 +74,10 @@ interface tasks {
  export async function updateTasks(req:Request,res:Response){
    const { id } = req.params;
     const update = req.body;
+
+    if (!id) {
+        return res.status(405).json({ message: "Error Updating tasks could not find id" });
+    }
     
     if (!update || Object.keys(update).length === 0) {
         return res.status(400).json({ message: "Error updating tasks: no update data provided" });
@@ -114,8 +118,14 @@ interface tasks {
 
 export async function assignTaskToUser(req:Request,res:Response){
 
-try {  const {taskid} = req.params  // det förvinarrade me som fan så här  det här PRODUKT  id DVS FRÅN KLUSTER PRODUKT
-   const {asignedtoo} = req.body  // DET HÄR USER ID 
+try {
+    const { taskid } = req.params;  // det förvinarrade me som fan så här  det här PRODUKT  id DVS FRÅN KLUSTER PRODUKT
+    const { asignedtoo } = req.body;  // DET HÄR USER ID
+
+    if (!taskid || !asignedtoo) {
+        return res.status(400).json({ message: "taskid and asignedtoo are required" });
+
+    }
    const finduser = await Tasks.findByIdAndUpdate(taskid,{$set:{asignedtoo:asignedtoo}},{new:true})
    res.status(200).json({message:"Task has been assigned to user"})  
 } catch (error) {
